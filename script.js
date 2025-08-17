@@ -1,4 +1,3 @@
-// Select the hands
 const secondHand = document.querySelector('.second-hand');
 const minuteHand = document.querySelector('.min-hand');
 const hourHand = document.querySelector('.hour-hand');
@@ -6,24 +5,42 @@ const hourHand = document.querySelector('.hour-hand');
 function setDate() {
   const now = new Date();
 
-  // Seconds
+  // --- Seconds ---
   const seconds = now.getSeconds();
-  const secondsDegrees = ((seconds / 60) * 360) + 90; 
-  secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
+  const secondsDegrees = (6 * seconds + 90) % 360;
+  applyMatrix(secondHand, secondsDegrees);
 
-  // Minutes
-  const minutes = now.getMinutes();
-  const minutesDegrees = ((minutes / 60) * 360) + ((seconds/60)*6) + 90; 
-  minuteHand.style.transform = `rotate(${minutesDegrees}deg)`;
+  // --- Minutes ---
+  const mins = now.getMinutes();
+  const minsDegrees = (6 * mins + 90) % 360;
+  applyMatrix(minuteHand, minsDegrees);
 
-  // Hours
-  const hours = now.getHours();
-  const hoursDegrees = ((hours / 12) * 360) + ((minutes/60)*30) + 90;
-  hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+  // --- Hours ---
+  const hour = now.getHours();
+  const hourDegrees = (30 * hour + mins / 2 + 90) % 360;
+  applyMatrix(hourHand, hourDegrees);
 }
 
-// Update every second
-setInterval(setDate, 1000);
+function applyMatrix(hand, degrees) {
+  // Convert to radians
+  const radians = degrees * Math.PI / 180;
 
-// Run once on load
+  // Rotation matrix
+  let a = Math.cos(radians);
+  let b = Math.sin(radians);
+  let c = -b;
+  let d = a;
+  let e = 0;
+  let f = 0;
+
+  // Round to 6 decimal places
+  a = parseFloat(a.toFixed(6));
+  b = parseFloat(b.toFixed(6));
+  c = parseFloat(c.toFixed(6));
+  d = parseFloat(d.toFixed(6));
+
+  hand.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`;
+}
+
+setInterval(setDate, 1000);
 setDate();
